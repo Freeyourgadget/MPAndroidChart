@@ -1,6 +1,9 @@
 
 package com.github.mikephil.charting.data;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -283,14 +286,36 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
 
     @Override
     public T getEntryForIndex(int index) {
-        if (mValues == null || mValues.isEmpty()) {
-            return null;
+        if (mValues == null || index < 0 || index >= mValues.size()) {
+            return (T) getEmptyEntry();
         }
-	if(index<0)
-            return null;
-        if(index>=mValues.size())
-            return null;
         return mValues.get(index);
+    }
+
+    private Entry getEmptyEntry() {
+        Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+
+        if (type == BarEntry.class) {
+            return new BarEntry(0, 0);
+        }
+
+        if (type == BubbleEntry.class) {
+            return new BubbleEntry(0, 0, 0);
+        }
+
+        if (type == CandleEntry.class) {
+            return new CandleEntry(0, 0, 0, 0, 0);
+        }
+
+        if (type == PieEntry.class) {
+            return new PieEntry(0);
+        }
+
+        if (type == RadarEntry.class) {
+            return new RadarEntry(0);
+        }
+
+        return new Entry(0, 0);
     }
 
     @Override
